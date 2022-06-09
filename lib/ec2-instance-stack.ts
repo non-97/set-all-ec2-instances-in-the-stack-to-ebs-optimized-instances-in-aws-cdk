@@ -1,5 +1,6 @@
 import { Stack, StackProps, aws_ec2 as ec2 } from "aws-cdk-lib";
 import { Construct } from "constructs";
+import { EbsOptimizedEc2Instance } from "./ebs-optimized-ec2-Instance";
 
 export class Ec2InstanceStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -18,7 +19,7 @@ export class Ec2InstanceStack extends Stack {
     });
 
     // EC2 Instance
-    new ec2.Instance(this, "EC2 Instance Amazon Linux 2", {
+    new EbsOptimizedEc2Instance(this, "EC2 Instance Amazon Linux 2", {
       instanceType: new ec2.InstanceType("t3.micro"),
       machineImage: ec2.MachineImage.latestAmazonLinux({
         generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
@@ -38,7 +39,7 @@ export class Ec2InstanceStack extends Stack {
       }),
     });
 
-    new ec2.Instance(this, "EC2 Instance Windows Server 2022", {
+    new EbsOptimizedEc2Instance(this, "EC2 Instance Windows Server 2022", {
       instanceType: new ec2.InstanceType("t3.micro"),
       machineImage: ec2.MachineImage.latestWindows(
         ec2.WindowsVersion.WINDOWS_SERVER_2022_ENGLISH_FULL_BASE
@@ -56,13 +57,6 @@ export class Ec2InstanceStack extends Stack {
       vpcSubnets: vpc.selectSubnets({
         subnetType: ec2.SubnetType.PUBLIC,
       }),
-    });
-
-    // Enable EBS Optimized
-    this.node.children.forEach((child) => {
-      if (child.node.defaultChild instanceof ec2.CfnInstance) {
-        child.node.defaultChild.ebsOptimized = true;
-      }
     });
   }
 }
